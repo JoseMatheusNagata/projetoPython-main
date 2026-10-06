@@ -104,10 +104,23 @@ def aluno_lista(request):
     .filter(ativo=True). Explique a escolha no README -- e a mesma
     pergunta do bonus da Entrega 1.
     """
-    return todo(
-        request, 7, "Listar alunos", "academico/views.py :: aluno_lista",
-        "Consultar Aluno.objects, aplicar a busca e renderizar aluno_lista.html.",
+    alunos = Aluno.objects.all()
+    busca = request.GET.get('busca', '').strip()
+
+    #filtro por nome, matricula ou email
+    if busca:
+        alunos = alunos.filter(
+            Q(nome__icontains=busca) |
+            Q(matricula__icontains=busca) |
+            Q(email__icontains=busca)
+        )
+
+    return render(
+        request,
+        "academico/aluno_lista.html",
+        {"alunos": alunos, "busca":busca},
     )
+
 
 
 @login_required

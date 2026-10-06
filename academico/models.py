@@ -98,6 +98,12 @@ class Aluno(models.Model):
     """
 
     # >>> ESCREVA OS CAMPOS AQUI <<<
+    #campos da tabela
+    matricula = models.CharField("matricula", max_length=20, unique=True)
+    nome = models.CharField("nome", max_length=120)
+    email = models.EmailField("e-mail", blank=True)
+    data_nascimento = models.DateField("data de nascimento", null=True, blank=True)
+    ativo = models.BooleanField("ativo", default=True)
 
     class Meta:
         # Mantemos o nome de tabela da Entrega 1. Sem esta linha, o
@@ -111,7 +117,7 @@ class Aluno(models.Model):
         # modelo -- equivale a por ORDER BY nome em todo SELECT.
         # (Esta linha vem comentada porque o Django recusa subir com
         #  ordering apontando para um campo que ainda nao existe.)
-        # ordering = ["nome"]
+        ordering = ["nome"]
 
     def __str__(self):
         """
@@ -123,7 +129,7 @@ class Aluno(models.Model):
         implementar, voce vai ver "Aluno object (1)" na tela de
         inscricao e nao vai saber quem e quem.
         """
-        return super().__str__()
+        return f"{self.matricula} - {self.nome}"
 
 
 class Disciplina(models.Model):
@@ -159,17 +165,25 @@ class Disciplina(models.Model):
     """
 
     # >>> ESCREVA OS CAMPOS AQUI <<<
+    
+    codigo = models.CharField("codigo", max_length=20, unique=True)
+    nome = models.CharField("nome", max_length=120)
+    carga_horaria = models.IntegerField(
+        "carga horaria", 
+        validators=[MinValueValidator(1)]
+    )
+    periodo = models.IntegerField("periodo", null=True, blank=True)
 
     class Meta:
         db_table = "disciplina"
         verbose_name = "disciplina"
         verbose_name_plural = "disciplinas"
         # DESCOMENTE depois de declarar os campos (TODO 2).
-        # ordering = ["periodo", "nome"]
+        ordering = ["periodo", "nome"]
 
     def __str__(self):
         """TODO 2b -- sugestao: f"{self.codigo} - {self.nome}" """
-        return super().__str__()
+        return f"{self.codigo} - {self.nome}"
 
 
 class Inscricao(models.Model):
@@ -241,6 +255,31 @@ class Inscricao(models.Model):
     """
 
     # >>> ESCREVA OS CAMPOS AQUI <<<
+    #campos da tabela
+    aluno = models.ForeignKey("Aluno",
+            on_delete=models.PROTECT,
+            related_name="inscricoes",
+            verbose_name="aluno",
+        )
+
+    disciplina = models.ForeignKey("Disciplina",
+            on_delete=models.PROTECT,
+            related_name="inscricoes",
+            verbose_name="disciplina"
+            )
+    
+    nota1 = models.DecimalField(
+             "1a nota", max_digits=4, decimal_places=2,
+            null=True, blank=True,
+             validators=[MinValueValidator(0), MaxValueValidator(10)],
+            )
+
+    nota2 = models.DecimalField(
+             "2a nota", max_digits=4, decimal_places=2,
+             null=True, blank=True,
+             validators=[MinValueValidator(0), MaxValueValidator(10)],
+            )
+
     #
     # Para as notas, DecimalField e melhor que FloatField:
     #
@@ -261,12 +300,18 @@ class Inscricao(models.Model):
         verbose_name = "inscricao"
         verbose_name_plural = "inscricoes"
         # DESCOMENTE depois de declarar as chaves estrangeiras (TODO 3).
-        # ordering = ["aluno", "disciplina"]
+        ordering = ["aluno", "disciplina"]
         # >>> DECLARE A UniqueConstraint AQUI <<<
+        constraints = [
+                    models.UniqueConstraint(
+                        fields=["aluno", "disciplina"],
+                        name="inscricao_unica_por_aluno_disciplina",
+                    )
+                ]
 
     def __str__(self):
         """TODO 3b -- sugestao: f"{self.aluno} em {self.disciplina}" """
-        return super().__str__()
+        return f"{self.aluno} em {self.disciplina}"
 
     @property
     def media(self):
@@ -285,4 +330,6 @@ class Inscricao(models.Model):
                 return None
             return (self.nota1 + self.nota2) / 2
         """
-        return None
+        if self.nota1 is None or self.nota2 is None:
+            return None
+        return (self.nota1 + self.nota2) / 2
