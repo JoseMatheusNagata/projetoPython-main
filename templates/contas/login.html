@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block titulo %}Entrar &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="tela-login">
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h4 mb-1">Entrar</h1>
+      <p class="text-body-secondary small mb-4">
+        Use as credenciais fornecidas pela coordenacao.
+      </p>
+
+      {% comment %} method="post" porque a senha NAO pode ir na URL. Um GET
+         colocaria a senha em /login/?password=123 -- visivel no
+         historico do navegador e no log do servidor. {% endcomment %}
+      <form method="post" novalidate>
+
+        {% comment %} ------------------------------------------------------
+           {% csrf_token %} e OBRIGATORIO em todo <form method="post">.
+
+           Ele insere um campo escondido com um token unico da sessao.
+           Sem isso, outro site poderia enviar um formulario em nome
+           do seu usuario logado (ataque CSRF) -- e o Django recusa a
+           requisicao com erro 403 se o token faltar.
+
+           Esqueceu o csrf_token = 403 na cara. Erro numero 1 de quem
+           esta comecando.
+           ------------------------------------------------------ {% endcomment %}
+        {% csrf_token %}
+
+        {% comment %} Erros que nao pertencem a um campo especifico -- por
+           exemplo "usuario ou senha invalidos". {% endcomment %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 small">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        {% for campo in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+            {{ campo }}
+            {% for erro in campo.errors %}
+              <div class="text-danger small mt-1">{{ erro }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+
+        <button class="btn btn-primary w-100" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

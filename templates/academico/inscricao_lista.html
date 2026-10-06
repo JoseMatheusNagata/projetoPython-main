@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titulo %}Notas &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 m-0">Inscricoes e notas</h1>
+  <a class="btn btn-primary" href="{% url 'academico:inscricao_nova' %}">Nova inscricao</a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead class="table-light">
+        <tr>
+          <th>Aluno</th><th>Disciplina</th>
+          <th class="text-center">1a nota</th><th class="text-center">2a nota</th>
+          <th class="text-center">Media</th><th class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inscricao in inscricoes %}
+          <tr>
+            {% comment %} inscricao.aluno atravessa a chave estrangeira: e o JOIN,
+               escrito com um ponto. Se a view usou select_related, isto
+               NAO custa uma consulta extra por linha. {% endcomment %}
+            <td>{{ inscricao.aluno.nome }}
+                <span class="text-body-secondary small d-block">{{ inscricao.aluno.matricula }}</span></td>
+            <td>{{ inscricao.disciplina.nome }}
+                <span class="text-body-secondary small d-block">{{ inscricao.disciplina.codigo }}</span></td>
+
+            <td class="text-center">{{ inscricao.nota1|default_if_none:"--" }}</td>
+            <td class="text-center">{{ inscricao.nota2|default_if_none:"--" }}</td>
+
+            {% comment %} |default_if_none e NAO |default, de proposito.
+
+               |default troca qualquer valor FALSO -- e nota 0 e falsa
+               em Python. O aluno que tirou zero apareceria com "--",
+               como se a nota nao tivesse sido lancada.
+
+               |default_if_none so troca o None de verdade. Mesma
+               pegadinha do TODO 3c em academico/models.py. {% endcomment %}
+            <td class="text-center">
+              {% if inscricao.media is not None %}
+                <span class="badge {% if inscricao.media >= 6 %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                  {{ inscricao.media|floatformat:1 }}
+                </span>
+              {% else %}
+                <span class="text-body-secondary">--</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{% url 'academico:inscricao_editar' inscricao.pk %}">Notas</a>
+              <a class="btn btn-sm btn-outline-danger"
+                 href="{% url 'academico:inscricao_excluir' inscricao.pk %}">Cancelar</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="tabela-vazia">
+            Nenhuma inscricao lancada.
+          </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

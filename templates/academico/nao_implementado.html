@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% comment %} Tela provisoria exibida pelas views que ainda estao como TODO.
+   Ela existe para que o sistema rode desde o primeiro minuto: voce
+   navega pelo menu inteiro e cada tela diz o que falta fazer.
+
+   Quando todos os TODOs estiverem prontos, nenhuma view chama mais
+   esta tela e voce pode apagar o arquivo. {% endcomment %}
+
+{% block titulo %}TODO {{ numero }} &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-warning">
+      <div class="card-body p-4">
+        <span class="badge text-bg-warning mb-2">TODO {{ numero }}</span>
+        <h1 class="h4">{{ titulo }}</h1>
+        <p class="text-body-secondary">{{ descricao }}</p>
+
+        <hr>
+
+        <p class="mb-1"><strong>Onde implementar</strong></p>
+        <p><code>{{ arquivo }}</code></p>
+
+        <p class="mb-1"><strong>Onde esta o exemplo pronto</strong></p>
+        <p><code>contas/views.py</code> &mdash; as mesmas operacoes, comentadas linha a linha.</p>
+
+        <p class="mb-1"><strong>Como conferir o seu progresso</strong></p>
+        <pre class="bg-body-tertiary p-3 rounded mb-0"><code>python verificar.py</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

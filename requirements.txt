@@ -1,0 +1,16 @@
+# ARA0095 - Sistema de Registro Academico
+# Instale com:  pip install -r requirements.txt
+
+# O framework web. 5.2 e uma versao LTS (Long Term Support): recebe
+# correcoes de seguranca ate 2028, entao o projeto nao "vence" no meio
+# do semestre.
+Django==5.2.6
+
+# Le o arquivo .env e injeta as variaveis no ambiente, para que a
+# SECRET_KEY fique FORA do codigo versionado.
+python-dotenv==1.1.1
+
+# O banco e SQLite -- o mesmo da Entrega 1. Nao precisa instalar nada:
+# o modulo sqlite3 ja vem com o Python, e o Django fala com ele
+# direto. Foi de proposito: zero instalacao, zero servico rodando,
+# o banco e um arquivo que voce pode abrir no DB Browser for SQLite.

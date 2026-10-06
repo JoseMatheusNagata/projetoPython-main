@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}Disciplinas &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 m-0">Disciplinas</h1>
+  <a class="btn btn-primary" href="{% url 'academico:disciplina_nova' %}">Nova disciplina</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-8 col-md-6">
+    <input type="search" name="busca" value="{{ busca }}" class="form-control"
+           placeholder="Buscar por codigo ou nome">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+    {% if busca %}<a class="btn btn-link" href="{% url 'academico:disciplina_lista' %}">Limpar</a>{% endif %}
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead class="table-light">
+        <tr>
+          <th>Codigo</th><th>Nome</th><th>Carga horaria</th>
+          <th>Periodo</th><th class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for disciplina in disciplinas %}
+          <tr>
+            <td><code>{{ disciplina.codigo }}</code></td>
+            <td>{{ disciplina.nome }}</td>
+            <td>{{ disciplina.carga_horaria }}h</td>
+            <td>{{ disciplina.periodo|default:"--" }}</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{% url 'academico:disciplina_editar' disciplina.pk %}">Editar</a>
+              <a class="btn btn-sm btn-outline-danger"
+                 href="{% url 'academico:disciplina_excluir' disciplina.pk %}">Excluir</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="tabela-vazia">
+            {% if busca %}
+              Nenhuma disciplina encontrada para &ldquo;{{ busca }}&rdquo;.
+            {% else %}
+              Nenhuma disciplina cadastrada.
+            {% endif %}
+          </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block titulo %}Painel &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<h1 class="h3 mb-4">Painel</h1>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5">Alunos</h2>
+        <p class="text-body-secondary small">Cadastro e consulta de alunos.</p>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'academico:aluno_lista' %}">Abrir</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5">Disciplinas</h2>
+        <p class="text-body-secondary small">Cadastro de disciplinas e carga horaria.</p>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'academico:disciplina_lista' %}">Abrir</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5">Notas</h2>
+        <p class="text-body-secondary small">Inscricao em disciplinas e lancamento de notas.</p>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'academico:inscricao_lista' %}">Abrir</a>
+      </div>
+    </div>
+  </div>
+
+  {% if user.eh_coordenacao %}
+  <div class="col-md-4">
+    <div class="card h-100 border-secondary">
+      <div class="card-body">
+        <h2 class="h5">Usuarios</h2>
+        <p class="text-body-secondary small">Gestao de acesso ao sistema.</p>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'contas:usuario_lista' %}">Abrir</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

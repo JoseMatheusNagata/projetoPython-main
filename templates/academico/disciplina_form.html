@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo|default:"Disciplina" }} &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3">{{ titulo|default:"Disciplina" }}</h1>
+    <div class="card">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "academico/_campos_form.html" %}
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <a class="btn btn-outline-secondary" href="{% url 'academico:disciplina_lista' %}">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

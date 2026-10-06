@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block titulo %}Pagina nao encontrada{% endblock %}
+
+{% block conteudo %}
+<div class="text-center py-5">
+  <p class="display-6 mb-3">404</p>
+  <h1 class="h4">Pagina nao encontrada</h1>
+  <p class="text-body-secondary">
+    O endereco nao existe ou o registro procurado foi removido.
+  </p>
+  <a class="btn btn-outline-primary mt-2" href="{% url 'contas:painel' %}">Voltar ao painel</a>
+</div>
+{% endblock %}

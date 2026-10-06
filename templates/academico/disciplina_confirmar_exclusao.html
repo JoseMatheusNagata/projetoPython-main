@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Excluir disciplina &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row"><div class="col-lg-6">
+  <h1 class="h3 mb-3">Excluir disciplina</h1>
+  <div class="card border-danger"><div class="card-body">
+    <p>Confirma a exclusao de <strong>{{ disciplina.nome }}</strong>
+       (<code>{{ disciplina.codigo }}</code>)?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Sim, excluir</button>
+      <a class="btn btn-outline-secondary" href="{% url 'academico:disciplina_lista' %}">Cancelar</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

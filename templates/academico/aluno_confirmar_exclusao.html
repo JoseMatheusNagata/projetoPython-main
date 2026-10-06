@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Excluir aluno &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row"><div class="col-lg-6">
+  <h1 class="h3 mb-3">Excluir aluno</h1>
+  <div class="card border-danger"><div class="card-body">
+    <p>Confirma a exclusao de <strong>{{ aluno.nome }}</strong>
+       (<code>{{ aluno.matricula }}</code>)?</p>
+    <p class="text-body-secondary small">
+      Se o aluno tiver inscricoes e o modelo usar
+      <code>on_delete=PROTECT</code>, o banco vai impedir a exclusao &mdash;
+      e isso e o esperado: nota lancada e historico academico.
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Sim, excluir</button>
+      <a class="btn btn-outline-secondary" href="{% url 'academico:aluno_lista' %}">Cancelar</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

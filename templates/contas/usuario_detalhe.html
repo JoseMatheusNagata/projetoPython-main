@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ usuario_obj.username }} &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+{% comment %} Repare no nome da variavel: usuario_obj, e nao usuario.
+
+   O context processor "auth" ja injeta {{ user }} em todo template
+   (quem esta logado). Se a view mandasse a variavel como "user", ela
+   sobrescreveria aquela -- e a navbar passaria a mostrar o usuario
+   sendo visitado como se fosse voce. Bug sutil e classico. {% endcomment %}
+<div class="row">
+  <div class="col-lg-7">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h3 m-0">{{ usuario_obj.get_full_name|default:usuario_obj.username }}</h1>
+      {% if usuario_obj.is_active %}
+        <span class="badge text-bg-success">Ativo</span>
+      {% else %}
+        <span class="badge text-bg-secondary">Desativado</span>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <dl class="row m-0">
+          <dt class="col-sm-4">Usuario (login)</dt>
+          <dd class="col-sm-8"><code>{{ usuario_obj.username }}</code></dd>
+
+          <dt class="col-sm-4">E-mail</dt>
+          <dd class="col-sm-8">{{ usuario_obj.email }}</dd>
+
+          <dt class="col-sm-4">Perfil</dt>
+          <dd class="col-sm-8">{{ usuario_obj.get_perfil_display }}</dd>
+
+          <dt class="col-sm-4">Cadastrado em</dt>
+          {% comment %} |date: e um FILTRO. Formata a data na hora de exibir, sem
+             a view precisar converter nada. {% endcomment %}
+          <dd class="col-sm-8">{{ usuario_obj.date_joined|date:"d/m/Y H:i" }}</dd>
+
+          <dt class="col-sm-4">Ultimo acesso</dt>
+          <dd class="col-sm-8">{{ usuario_obj.last_login|date:"d/m/Y H:i"|default:"nunca acessou" }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <a class="btn btn-primary" href="{% url 'contas:usuario_editar' usuario_obj.pk %}">Editar</a>
+      <a class="btn btn-outline-secondary" href="{% url 'contas:usuario_lista' %}">Voltar</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

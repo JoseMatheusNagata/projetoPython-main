@@ -1,0 +1,39 @@
+{% comment %} ----------------------------------------------------------------
+   Trecho reaproveitavel que desenha os campos de um formulario.
+
+   Os tres formularios do app (aluno, disciplina, inscricao) incluem
+   este arquivo com {% include %}, em vez de repetir o mesmo laco tres
+   vezes. Mesmo principio do base.html: escrever uma vez, no lugar
+   certo.
+
+   O underline no comeco do nome (_campos_form.html) e convencao:
+   sinaliza "isto e um pedaco, nao uma pagina inteira".
+   ---------------------------------------------------------------- {% endcomment %}
+
+{% if form.non_field_errors %}
+  <div class="alert alert-danger py-2 small">{{ form.non_field_errors }}</div>
+{% endif %}
+
+{% for campo in form %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ campo.id_for_label }}">
+      {{ campo.label }}
+      {% if campo.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+
+    {{ campo }}
+
+    {% if campo.help_text %}<span class="helptext">{{ campo.help_text|safe }}</span>{% endif %}
+
+    {% for erro in campo.errors %}
+      <div class="text-danger small mt-1">{{ erro }}</div>
+    {% endfor %}
+  </div>
+{% empty %}
+  {# Cai aqui enquanto o `fields = []` do TODO 4/5/6 nao for preenchido. #}
+  <div class="alert alert-warning small mb-0">
+    Este formulario ainda nao tem campos. Preencha a lista
+    <code>fields</code> na classe <code>Meta</code> em
+    <code>academico/forms.py</code>.
+  </div>
+{% endfor %}

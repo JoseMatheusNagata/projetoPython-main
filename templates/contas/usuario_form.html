@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo }} &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3">{{ titulo }}</h1>
+
+    <div class="card">
+      <div class="card-body">
+        {% comment %} ESTE MESMO TEMPLATE serve para criar E para editar.
+
+           A view decide qual form passar (UsuarioCriarForm ou
+           UsuarioEditarForm) e o template so renderiza o que
+           recebeu. Nao precisa saber a diferenca -- por isso nao
+           existe usuario_criar.html e usuario_editar.html. {% endcomment %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 small">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          {% for campo in form %}
+            <div class="mb-3 {% if campo.field.widget.input_type == 'checkbox' %}form-check{% endif %}">
+              <label class="form-label" for="{{ campo.id_for_label }}">
+                {{ campo.label }}
+                {% if campo.field.required %}<span class="text-danger">*</span>{% endif %}
+              </label>
+
+              {% comment %} {{ campo }} imprime o <input>/<select> ja montado pelo
+                 Django, com o valor preenchido e o name correto. {% endcomment %}
+              {{ campo }}
+
+              {% if campo.help_text %}
+                <span class="helptext">{{ campo.help_text|safe }}</span>
+              {% endif %}
+
+              {% for erro in campo.errors %}
+                <div class="text-danger small mt-1">{{ erro }}</div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <a class="btn btn-outline-secondary" href="{% url 'contas:usuario_lista' %}">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

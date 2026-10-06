@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block titulo %}Usuarios &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 m-0">Usuarios</h1>
+  <a class="btn btn-primary" href="{% url 'contas:usuario_novo' %}">Novo usuario</a>
+</div>
+
+{% comment %} Busca por GET, e nao POST, de proposito: assim o resultado fica na
+   URL (/usuarios/?busca=maria) e pode ser guardado nos favoritos,
+   compartilhado e recarregado com F5 sem aviso de reenvio. Regra
+   geral: GET para ler, POST para alterar. {% endcomment %}
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-8 col-md-6">
+    <input type="search" name="busca" value="{{ busca }}" class="form-control"
+           placeholder="Buscar por nome, usuario ou e-mail">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+    {% if busca %}
+      <a class="btn btn-link" href="{% url 'contas:usuario_lista' %}">Limpar</a>
+    {% endif %}
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nome</th>
+          <th>Usuario</th>
+          <th>E-mail</th>
+          <th>Perfil</th>
+          <th>Situacao</th>
+          <th class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% comment %} O {% for %} percorre o QuerySet. E NESTE momento que o
+           Django finalmente vai ao banco -- ate aqui a consulta era
+           so uma receita guardada (lazy evaluation). {% endcomment %}
+        {% for u in usuarios %}
+          <tr class="{% if not u.is_active %}inativo{% endif %}">
+            <td>{{ u.get_full_name|default:"--" }}</td>
+            <td><code>{{ u.username }}</code></td>
+            <td>{{ u.email }}</td>
+
+            {% comment %} get_<campo>_display() devolve o rotulo legivel de um
+               campo com choices: mostra "Coordenacao", nao "COORD". {% endcomment %}
+            <td><span class="badge text-bg-light">{{ u.get_perfil_display }}</span></td>
+
+            <td>
+              {% if u.is_active %}
+                <span class="badge text-bg-success">Ativo</span>
+              {% else %}
+                <span class="badge text-bg-secondary">Desativado</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary"
+                 href="{% url 'contas:usuario_detalhe' u.pk %}">Ver</a>
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{% url 'contas:usuario_editar' u.pk %}">Editar</a>
+
+              {% if u.is_active %}
+                <a class="btn btn-sm btn-outline-danger"
+                   href="{% url 'contas:usuario_excluir' u.pk %}">Desativar</a>
+              {% else %}
+                <form method="post" action="{% url 'contas:usuario_reativar' u.pk %}"
+                      class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-success" type="submit">Reativar</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          {% comment %} {% empty %} roda quando a lista vem vazia. Evita aquele
+             if separado so para dizer "nenhum registro". {% endcomment %}
+          <tr>
+            <td colspan="6" class="tabela-vazia">
+              {% if busca %}
+                Nenhum usuario encontrado para &ldquo;{{ busca }}&rdquo;.
+              {% else %}
+                Nenhum usuario cadastrado ainda.
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

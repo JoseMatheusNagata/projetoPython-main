@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block titulo %}Desativar usuario &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row">
+  <div class="col-lg-6">
+    <h1 class="h3 mb-3">Desativar usuario</h1>
+
+    <div class="card border-danger">
+      <div class="card-body">
+        <p>
+          Confirma a desativacao de
+          <strong>{{ usuario_obj.get_full_name|default:usuario_obj.username }}</strong>
+          (<code>{{ usuario_obj.username }}</code>)?
+        </p>
+
+        <div class="alert alert-info small">
+          O registro <strong>nao sera apagado</strong> do banco. O usuario apenas deixa
+          de conseguir entrar no sistema, e o historico de tudo que ele fez continua
+          intacto. Isso se chama <em>soft delete</em> &mdash; e o motivo esta explicado
+          em <code>contas/views.py</code>, na funcao <code>usuario_excluir</code>.
+        </div>
+
+        {% comment %} A exclusao acontece no POST deste form, nunca no GET que
+           mostrou esta pagina. Ver o comentario na view. {% endcomment %}
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">Sim, desativar</button>
+          <a class="btn btn-outline-secondary" href="{% url 'contas:usuario_lista' %}">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Cancelar inscricao &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="row"><div class="col-lg-6">
+  <h1 class="h3 mb-3">Cancelar inscricao</h1>
+  <div class="card border-danger"><div class="card-body">
+    <p>Confirma o cancelamento da inscricao de
+       <strong>{{ inscricao.aluno.nome }}</strong> em
+       <strong>{{ inscricao.disciplina.nome }}</strong>?</p>
+    <p class="text-body-secondary small">As notas lancadas serao perdidas.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Sim, cancelar inscricao</button>
+      <a class="btn btn-outline-secondary" href="{% url 'academico:inscricao_lista' %}">Voltar</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block titulo %}Alunos &middot; Sistema Academico{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 m-0">Alunos</h1>
+  <a class="btn btn-primary" href="{% url 'academico:aluno_novo' %}">Novo aluno</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-8 col-md-6">
+    <input type="search" name="busca" value="{{ busca }}" class="form-control"
+           placeholder="Buscar por nome ou matricula">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+    {% if busca %}<a class="btn btn-link" href="{% url 'academico:aluno_lista' %}">Limpar</a>{% endif %}
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle m-0">
+      <thead class="table-light">
+        <tr>
+          <th>Matricula</th><th>Nome</th><th>E-mail</th>
+          <th>Nascimento</th><th>Situacao</th><th class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for aluno in alunos %}
+          <tr class="{% if not aluno.ativo %}inativo{% endif %}">
+            <td><code>{{ aluno.matricula }}</code></td>
+            <td>{{ aluno.nome }}</td>
+            <td>{{ aluno.email|default:"--" }}</td>
+            <td>{{ aluno.data_nascimento|date:"d/m/Y"|default:"--" }}</td>
+            <td>
+              {% if aluno.ativo %}
+                <span class="badge text-bg-success">Ativo</span>
+              {% else %}
+                <span class="badge text-bg-secondary">Inativo</span>
+              {% endif %}
+            </td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{% url 'academico:aluno_editar' aluno.pk %}">Editar</a>
+              <a class="btn btn-sm btn-outline-danger"
+                 href="{% url 'academico:aluno_excluir' aluno.pk %}">Excluir</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="tabela-vazia">
+            {% if busca %}
+              Nenhum aluno encontrado para &ldquo;{{ busca }}&rdquo;.
+            {% else %}
+              Nenhum aluno cadastrado. Rode <code>python manage.py seed_demo</code>
+              para carregar dados de exemplo.
+            {% endif %}
+          </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

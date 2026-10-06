@@ -1,0 +1,32 @@
+/* ---------------------------------------------------------------
+   Ajustes proprios, por cima do Bootstrap.
+
+   O Bootstrap resolve 95% do visual. Este arquivo cuida do resto --
+   e fica pequeno de proposito: cada linha de CSS propria e uma linha
+   para manter.
+   --------------------------------------------------------------- */
+
+.tela-login {
+    max-width: 26rem;
+    margin: 6vh auto;
+}
+
+/* Deixa claro, na listagem, quem esta desativado. */
+tr.inativo td {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+/* Os textos de ajuda dos campos de formulario. */
+.helptext {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--bs-secondary-color);
+    margin-top: 0.25rem;
+}
+
+.tabela-vazia {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--bs-secondary-color);
+}
