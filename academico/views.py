@@ -155,10 +155,19 @@ def aluno_novo(request):
 
     O template espera: `form` e `titulo`.
     """
-    return todo(
-        request, 8, "Cadastrar aluno", "academico/views.py :: aluno_novo",
-        "Padrao POST/Redirect/GET com AlunoForm, renderizando aluno_form.html.",
-    )
+
+    if request.method == "POST":
+                form = AlunoForm(request.POST)
+                if form.is_valid():
+                    aluno = form.save()
+                    messages.success(request, f"Aluno '{aluno.nome}' cadastrado.")
+                    return redirect("academico:aluno_lista")
+                messages.error(request, "Corrija os erros do formulario.")
+    else:
+        form = AlunoForm()
+    
+    return render(request, "academico/aluno_form.html",
+                          {"form": form, "titulo": "Novo aluno"})
 
 
 @login_required
@@ -189,10 +198,29 @@ def aluno_editar(request, pk):
 
     O template espera: `form` e `titulo`.
     """
-    return todo(
-        request, 9, "Editar aluno", "academico/views.py :: aluno_editar",
-        "get_object_or_404 + AlunoForm(instance=aluno), renderizando aluno_form.html.",
+    aluno = get_object_or_404(Aluno, pk=pk)
+    
+    if request.method == "POST":
+        form = AlunoForm(request.POST, instance=aluno)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Usuario '{aluno.nome}' atualizado.")
+            return redirect("academico:aluno_lista")
+        else:
+            messages.error(request, "Corrija os erros destacados no formulario.")
+    else:
+        form = AlunoForm(instance=aluno)
+
+    return render(
+        request,
+        "academico/aluno_form.html",
+        {
+            "form": form,
+            "titulo": f"Editar {aluno.nome}",
+        },
     )
+
 
 
 @login_required
@@ -243,10 +271,20 @@ def aluno_excluir(request, pk):
 
     O template espera: `aluno`.
     """
-    return todo(
-        request, 9, "Excluir aluno", "academico/views.py :: aluno_excluir",
-        "GET mostra a confirmacao, POST executa a exclusao ou o soft delete.",
-    )
+    aluno = get_object_or_404(Aluno, pk=pk)
+
+    if request.method == "POST":
+        aluno.ativo = False
+        # save(update_fields=[...]) grava SO essa coluna:
+        #     UPDATE usuario SET is_active = false WHERE id = %s
+        # Sem o update_fields, o UPDATE reescreveria todas as colunas.
+        aluno.save(update_fields=["ativo"])
+
+        messages.success(request, f"Usuario '{aluno.nome}' desativado.")
+        return redirect("academico:aluno_lista")
+
+    return render(request, "academico/aluno_confirmar_exclusao.html", {"aluno": aluno})
+
 
 
 # =====================================================================

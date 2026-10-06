@@ -100,7 +100,13 @@ class AlunoForm(BootstrapMixin, forms.ModelForm):
 
     class Meta:
         model = Aluno
-        fields = []  # >>> SUBSTITUA pela lista de campos <<<
+        fields = ["matricula", "nome", "email", "data_nascimento", "ativo"]
+
+    def clean_matricula(self):
+                matricula = self.cleaned_data["matricula"].strip().upper()
+                if len(matricula) < 4:
+                    raise forms.ValidationError("A matricula deve ter ao menos 4 caracteres.")
+                return matricula
 
 
 class DisciplinaForm(BootstrapMixin, forms.ModelForm):
@@ -127,10 +133,20 @@ class DisciplinaForm(BootstrapMixin, forms.ModelForm):
     exatamente o problema dos "nomes de disciplina escritos de tres
     formas diferentes" descrito no cenario do trabalho.
     """
+    def clean_codigo(self):
+        # Converte para maiúsculas e remove espaços extras nas pontas
+        codigo = self.cleaned_data.get("codigo", "")
+        return codigo.strip().upper()
+
+    def clean_carga_horaria(self):
+        valor = self.cleaned_data.get("carga_horaria")
+        if valor is not None and valor <= 0:
+            raise forms.ValidationError("A carga horaria deve ser maior que zero.")
+        return valor
 
     class Meta:
-        model = Disciplina
-        fields = []  # >>> SUBSTITUA pela lista de campos <<<
+            model = Disciplina
+            fields = ["codigo", "nome", "carga_horaria", "periodo"]
 
 
 class InscricaoForm(BootstrapMixin, forms.ModelForm):
@@ -180,7 +196,18 @@ class InscricaoForm(BootstrapMixin, forms.ModelForm):
     o usuario. Foi por isso que o enunciado da Entrega 1 dizia que o
     "UNIQUE constraint failed" e o banco protegendo voce.
     """
+    def __init__(self, *args, **kwargs):
+                   super().__init__(*args, **kwargs)
+                   self.fields["aluno"].queryset = Aluno.objects.filter(ativo=True)
 
     class Meta:
         model = Inscricao
-        fields = []  # >>> SUBSTITUA pela lista de campos <<<
+        fields = ["aluno", "disciplina", "nota1", "nota2"]
+        error_messages = {
+                           forms.models.NON_FIELD_ERRORS: {
+                               "unique_together": "Este aluno ja esta inscrito nesta disciplina.",
+                           }
+                       }
+
+        
+    
