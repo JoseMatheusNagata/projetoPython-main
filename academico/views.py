@@ -303,11 +303,22 @@ def disciplina_lista(request):
     TODO 10 -- Listar disciplinas, com busca por codigo ou nome.
     Espelhe o TODO 7. O template espera: `disciplinas` e `busca`.
     """
-    return todo(
-        request, 10, "Listar disciplinas", "academico/views.py :: disciplina_lista",
-        "Mesmo padrao do TODO 7, agora com Disciplina.",
-    )
+    disciplinas = Disciplina.objects.all()
+    busca = request.GET.get('busca', '').strip()
 
+    #filtro por nome e codigo
+    if busca:
+        disciplinas = disciplinas.filter(
+            Q(codigo__icontains=busca) |
+            Q(nome__icontains=busca)
+        )
+
+    return render(
+        request,
+        "academico/disciplina_lista.html",
+        {"disciplinas": disciplinas, "busca":busca},
+    )
+ 
 
 @login_required
 def disciplina_nova(request):
@@ -315,10 +326,19 @@ def disciplina_nova(request):
     TODO 11a -- Cadastrar disciplina. Espelhe o TODO 8.
     O template espera: `form` e `titulo`.
     """
-    return todo(
-        request, 11, "Cadastrar disciplina", "academico/views.py :: disciplina_nova",
-        "Mesmo padrao do TODO 8, agora com DisciplinaForm.",
-    )
+    if request.method == "POST":
+        form = DisciplinaForm(request.POST)
+        if form.is_valid():
+            disciplina = form.save()
+            messages.success(request, f"Disciplina '{disciplina.nome}' cadastrado.")
+            return redirect("academico:disciplina_lista")
+        messages.error(request, "Corrija os erros do formulario.")
+    else:
+        form = DisciplinaForm()
+    
+    return render(request, "academico/disciplina_form.html",
+                            {"form": form, "titulo": "Nova Disciplina"})
+
 
 
 @login_required
@@ -327,9 +347,27 @@ def disciplina_editar(request, pk):
     TODO 11b -- Editar disciplina. Espelhe o TODO 9a.
     O template espera: `form` e `titulo`.
     """
-    return todo(
-        request, 11, "Editar disciplina", "academico/views.py :: disciplina_editar",
-        "Mesmo padrao do TODO 9a, agora com Disciplina.",
+    disciplina = get_object_or_404(Disciplina, pk=pk)
+        
+    if request.method == "POST":
+        form = DisciplinaForm(request.POST, instance=disciplina)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Disciplina '{disciplina.nome}' atualizado.")
+            return redirect("academico:disciplina_lista")
+        else:
+            messages.error(request, "Corrija os erros destacados no formulario.")
+    else:
+        form = DisciplinaForm(instance=disciplina)
+
+    return render(
+        request,
+        "academico/disciplina_form.html",
+        {
+            "form": form,
+            "titulo": f"Editar {disciplina.nome}",
+        },
     )
 
 
@@ -339,10 +377,22 @@ def disciplina_excluir(request, pk):
     TODO 11c -- Excluir disciplina. Espelhe o TODO 9b.
     O template espera: `disciplina`.
     """
-    return todo(
-        request, 11, "Excluir disciplina", "academico/views.py :: disciplina_excluir",
-        "Mesmo padrao do TODO 9b, agora com Disciplina.",
-    )
+    disciplina = get_object_or_404(Disciplina, pk=pk)
+    
+    if request.method == "POST":
+        from django.db.models import ProtectedError
+        try:
+            #DELETE de verdade:    
+            disciplina.delete()
+            messages.success(request, f"Disciplina '{disciplina.nome}' deletado.")
+
+        except ProtectedError:
+            messages.error(request, "Esta disciplina está ligada e uma inscrição, não é possivel deletar.")
+        
+
+        return redirect("academico:disciplina_lista")
+    return render(request, "academico/disciplina_confirmar_exclusao.html", {"disciplina": disciplina})
+
 
 
 # =====================================================================
