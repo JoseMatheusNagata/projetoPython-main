@@ -432,10 +432,25 @@ def inscricao_lista(request):
 
     O template espera: `inscricoes`.
     """
-    return todo(
-        request, 12, "Listar inscricoes", "academico/views.py :: inscricao_lista",
-        "Inscricao.objects.select_related('aluno', 'disciplina') -- o JOIN sem escrever JOIN.",
+
+    busca = request.GET.get('incricao', '').strip()
+
+    inscricao = Inscricao.objects.select_related("aluno", "disciplina")
+    
+    #filtro
+    if busca:
+        inscricao = inscricao.filter(
+            Q(aluno__icontains=busca) |
+            Q(disciplina__icontains=busca)
+        )
+    
+    return render(
+        request,
+        "academico/inscricao_lista.html",
+        {"inscricoes": inscricao, "busca":busca},
     )
+
+
 
 
 @login_required
@@ -449,10 +464,20 @@ def inscricao_nova(request):
     constraint, o sistema aceita a duplicata calado -- e o item 1 da
     rubrica vai embora junto.
     """
-    return todo(
-        request, 12, "Nova inscricao", "academico/views.py :: inscricao_nova",
-        "Mesmo padrao do TODO 8, agora com InscricaoForm.",
-    )
+
+    if request.method == "POST":
+        form = InscricaoForm(request.POST)
+        if form.is_valid():
+            inscricao = form.save()
+            messages.success(request, f"Incrição do aluno:'{inscricao.aluno.nome}'na disciplina {inscricao.disciplina.nome}.")
+            return redirect("academico:inscricao_lista")
+        messages.error(request, "Corrija os erros do formulario.")
+    else:
+        form = InscricaoForm()
+        
+    return render(request, "academico/inscricao_form.html",
+                {"form": form, "titulo": "Nova Inscrição"})
+    
 
 
 @login_required
@@ -461,11 +486,31 @@ def inscricao_editar(request, pk):
     TODO 12c -- Lancar ou corrigir as notas. Espelhe o TODO 9a.
     O template espera: `form` e `titulo`.
     """
-    return todo(
-        request, 12, "Lancar notas", "academico/views.py :: inscricao_editar",
-        "Mesmo padrao do TODO 9a, agora com Inscricao.",
+
+    inscricao = get_object_or_404(Inscricao, pk=pk)
+            
+    if request.method == "POST":
+        form = InscricaoForm(request.POST, instance=inscricao)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Inscrição do aluno: '{inscricao.aluno.nome}' da disciplina : '{inscricao.disciplina.nome}' atualizado.")
+            return redirect("academico:inscricao_lista")
+        else:
+            messages.error(request, "Corrija os erros destacados no formulario.")
+    else:
+        form = InscricaoForm(instance=inscricao)
+
+    return render(
+        request,
+        "academico/inscricao_form.html",
+        {
+            "form": form,
+            "titulo": f"Inscrição do aluno: '{inscricao.aluno.nome}' da disciplina : '{inscricao.disciplina.nome}'",
+        },
     )
 
+   
 
 @login_required
 def inscricao_excluir(request, pk):
@@ -473,7 +518,21 @@ def inscricao_excluir(request, pk):
     TODO 12d -- Cancelar inscricao. Espelhe o TODO 9b.
     O template espera: `inscricao`.
     """
-    return todo(
-        request, 12, "Cancelar inscricao", "academico/views.py :: inscricao_excluir",
-        "Mesmo padrao do TODO 9b, agora com Inscricao.",
-    )
+    inscricao = get_object_or_404(Inscricao, pk=pk)
+        
+    if request.method == "POST":
+        from django.db.models import ProtectedError
+        try:
+            #DELETE de verdade:    
+            inscricao.delete()
+            messages.success(request, f"Inscrição do aluno: '{inscricao.aluno.nome}' da disciplina : '{inscricao.disciplina.nome}' deletado.")
+
+        except ProtectedError:
+            messages.error(request, "Erro ao deletar a Inscrição.")
+        
+
+        return redirect("academico:inscricao_lista")
+    return render(request, "academico/inscricao_confirmar_exclusao.html", {"inscricao": inscricao})
+
+
+
