@@ -373,12 +373,11 @@ lado a lado.
 
 Anexe o `modelo_dados.png` e explique em poucas linhas as três tabelas e
 o relacionamento N:N.
-aluno: Armazena os dados cadastrais únicos de cada estudante (como matrícula e nome), onde cada registro representa uma pessoa individual.   
+aluno: salva os dados do aluno de cada estudante com um registro unico . 
 
-disciplina: Contém as matérias ofertadas pela instituição (código, nome e carga horária), existindo de forma independente dos alunos.   
+disciplina: salva as materias ofertadas pela instituicao. 
 
-inscricao: Atua como tabela associativa para resolver o relacionamento muitos-para-muitos (N:N), unindo as chaves estrangeiras de aluno e disciplina.  
-
+inscricao: tabela associativa para ligar um relacionamento muitos para muitos  
  O relacionamento N:N: Como um aluno pode cursar várias disciplinas e uma disciplina tem vários alunos matriculados, a relação direta não funciona em banco relacional; a tabela inscricao quebra isso em duas relações 1:N (aluno -> inscricao <- disciplina), permitindo guardar os dados que dependem exclusivamente desse encontro, como as notas. 
 
 **Responda:** por que `nota1` fica em `inscricao`, e não em `aluno` nem
@@ -396,6 +395,8 @@ alunos, uma relação n:n.
 
 Foi usado o soft delete por causa do histórico do aluno, se fosse usado o delete os registros do aluno seriam perdidos.
 
+Foi usado o Delete real nas incricoes, porque no futuro pode ser implementado uma nova coluna por exemplo, se está sendo cursado ou ja foi completado. Dificilmente será usado o delete real, somente em casos que o aluno fez a inscrição mas não irá cursar realmente o a disciplina.
+
 ### Uso de IA
 
 Registre o que foi gerado com auxílio de IA e o que o grupo revisou. Isso
@@ -405,7 +406,7 @@ oralmente sobre o código de qualquer forma.
 | Trecho | Gerado com IA? | Quem revisou | O que foi alterado |
 |---|---|---|---|
 | | | | |
-IA somente foi usado para procura um erro de digitação no view que foi escrito errado o caminho para um redirect.
+IA somente foi usado para procura um erro de digitação por exemplo no view que foi escrito errado o caminho para um redirect.
 
 ### Dificuldades
 
