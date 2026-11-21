@@ -101,7 +101,13 @@ class AlunoForm(BootstrapMixin, forms.ModelForm):
     class Meta:
         model = Aluno
         fields = ["matricula", "nome", "email", "data_nascimento", "ativo"]
-
+        widgets = {
+                    "data_nascimento": forms.DateInput(
+                        attrs={"type": "date"},
+                        format="%Y-%m-%d",
+                    ),
+                }
+    
     def clean_matricula(self):
                 matricula = self.cleaned_data["matricula"].strip().upper()
                 if len(matricula) < 4:
@@ -197,17 +203,17 @@ class InscricaoForm(BootstrapMixin, forms.ModelForm):
     "UNIQUE constraint failed" e o banco protegendo voce.
     """
     def __init__(self, *args, **kwargs):
-                   super().__init__(*args, **kwargs)
-                   self.fields["aluno"].queryset = Aluno.objects.filter(ativo=True)
+        super().__init__(*args, **kwargs)
+        self.fields["aluno"].queryset = Aluno.objects.filter(ativo=True)
 
     class Meta:
         model = Inscricao
         fields = ["aluno", "disciplina", "nota1", "nota2"]
         error_messages = {
-                           forms.models.NON_FIELD_ERRORS: {
-                               "unique_together": "Este aluno ja esta inscrito nesta disciplina.",
-                           }
-                       }
+            forms.models.NON_FIELD_ERRORS: {
+                "unique_together": "Este aluno ja esta inscrito nesta disciplina.",
+            }
+        }
 
         
     

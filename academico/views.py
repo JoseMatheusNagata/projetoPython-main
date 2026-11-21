@@ -205,7 +205,7 @@ def aluno_editar(request, pk):
 
         if form.is_valid():
             form.save()
-            messages.success(request, f"Usuario '{aluno.nome}' atualizado.")
+            messages.success(request, f"Aluno '{aluno.nome}' atualizado.")
             return redirect("academico:aluno_lista")
         else:
             messages.error(request, "Corrija os erros destacados no formulario.")
@@ -280,7 +280,7 @@ def aluno_excluir(request, pk):
         # Sem o update_fields, o UPDATE reescreveria todas as colunas.
         aluno.save(update_fields=["ativo"])
 
-        messages.success(request, f"Usuario '{aluno.nome}' desativado.")
+        messages.success(request, f"Aluno '{aluno.nome}' desativado.")
         return redirect("academico:aluno_lista")
 
     return render(request, "academico/aluno_confirmar_exclusao.html", {"aluno": aluno})
@@ -433,15 +433,15 @@ def inscricao_lista(request):
     O template espera: `inscricoes`.
     """
 
-    busca = request.GET.get('incricao', '').strip()
+    busca = request.GET.get('inscricao', '').strip()
 
     inscricao = Inscricao.objects.select_related("aluno", "disciplina")
     
     #filtro
     if busca:
         inscricao = inscricao.filter(
-            Q(aluno__icontains=busca) |
-            Q(disciplina__icontains=busca)
+            Q(aluno___nome__icontains=busca) |
+            Q(disciplina__nome__icontains=busca)
         )
     
     return render(
