@@ -26,7 +26,7 @@ some sozinha.
 --- A REGRA QUE NAO MUDOU DA ENTREGA 1 -------------------------------
 
   Item 5 da rubrica: separacao de responsabilidades. La, o CRUD nao
-  podia ter print() nem input(). Aqui vale o inverso: a view NAO monta
+  podia ter print( ) nem in put( ). Aqui vale o inverso: a view NAO monta
   HTML. Ela consulta, decide e entrega dados ao template.
 
 =====================================================================
@@ -184,7 +184,7 @@ def aluno_editar(request, pk):
       1. Busque o registro antes:
              aluno = get_object_or_404(Aluno, pk=pk)
          Isto faz o SELECT ... WHERE id = %s e devolve 404 se nao
-         achar -- substitui aquele `if aluno is None: print(...)` que
+         achar -- substitui aquele `if aluno is None: prin t(...)` que
          voce escrevia na Entrega 1.
 
       2. Passe instance=aluno ao montar o form, NOS DOIS CAMINHOS:
@@ -428,7 +428,7 @@ def inscricao_lista(request):
     select_related faz o JOIN e traz tudo em UMA consulta.
 
     Este e o assunto da Entrega 2. Veja material/03-orm-na-pratica.md
-    -- inclusive como espiar o SQL gerado com `print(qs.query)`.
+    -- inclusive como espiar o SQL gerado com `prin t(qs.query)`.
 
     O template espera: `inscricoes`.
     """
